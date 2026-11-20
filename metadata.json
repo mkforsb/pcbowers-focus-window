@@ -3,8 +3,9 @@
   "description": "This extension allows one to create various shortcuts for applications, enabling the ability to have one shortcut that triggers both the launch and focus of an application window.",
   "uuid": "focus-window@chris.al",
   "shell-version": [
-    "42"
+    "50"
   ],
+  "settings-schema": "org.gnome.shell.extensions.focus-window",
   "url": "https://github.com/pcbowers/focus-window",
-  "version": 1
+  "version": 2
 }

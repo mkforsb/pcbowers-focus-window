@@ -11,6 +11,8 @@ Do you want a pulldown mode on your terminal without having to switch to tilda o
 
 This extension allows one to create various shortcuts for applications, enabling the ability to have one shortcut that triggers both the launch and focus of an application window.
 
+Requires GNOME Shell 50. Versions of this extension for GNOME Shell 42 remain available on [extensions.gnome.org](https://extensions.gnome.org/extension/5571/focus-window/).
+
 <p align="center">
   <img src="media/focus-window.gif" style="border-radius: 10px; max-width: 500px; width: 100%;" alt="focus-window">
 </p>
@@ -36,10 +38,7 @@ This extension allows one to create various shortcuts for applications, enabling
 git clone git@github.com:pcbowers/focus-window.git $HOME/.local/share/gnome-shell/extensions/focus-window@chris.al
 ```
 
-2. Restart GNOME:
-
-- in an X11 session, press `Alt`+`F2` and then run `restart`
-- in Wayland, log out and log back in
+2. Log out and log back in (GNOME Shell 50 is Wayland-only, so the shell cannot be restarted in place)
 
 3. Enable the extension:
 

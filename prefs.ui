@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface domain="focus-window">
   <requires lib="gtk" version="4.0"/>
-  <template class="FocusWidget" parent="AdwExpanderRow">
+  <requires lib="libadwaita" version="1.8"/>
+  <template class="FocusWindowFocusWidget" parent="AdwExpanderRow">
     <property name="title">Application Name</property>
     <property name="subtitle">Shortcut Accelerator</property>
     <child>
@@ -26,9 +27,9 @@ Press Esc to cancel or Backspace to unbind the shortcut.</property>
         <property name="activatable-widget">keyboard_shortcut</property>
         <signal name="activated" handler="onKeyboardShortcutClicked" swapped="no" />
         <child>
-          <object class="GtkShortcutLabel" id="keyboard_shortcut">
+          <object class="AdwShortcutLabel" id="keyboard_shortcut">
             <property name="valign">center</property>
-            <property name="disabled_text">Not Bound</property>
+            <property name="disabled-text">Not Bound</property>
             <property name="focus-on-click">true</property>
             <property name="accelerator"></property>
           </object>

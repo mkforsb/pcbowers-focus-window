@@ -1,16 +1,12 @@
-"use strict";
+import Gio from "gi://Gio";
+import GObject from "gi://GObject";
+import Meta from "gi://Meta";
+import Shell from "gi://Shell";
 
-const { Shell, Meta, Gio, GObject } = imports.gi;
-const Main = imports.ui.main;
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
+import * as Main from "resource:///org/gnome/shell/ui/main.js";
+import { Extension } from "resource:///org/gnome/shell/extensions/extension.js";
 
-const SETTINGS_ID = "org.gnome.shell.extensions.focus-window";
 const SETTINGS_KEY = "app-settings";
-const SETTINGS_VARIANT = "aa{sv}";
-
-const appSys = Shell.AppSystem.get_default();
-const appWin = Shell.WindowTracker.get_default();
 
 const KeyboardShortcuts = GObject.registerClass(
   {},
@@ -71,17 +67,12 @@ const KeyboardShortcuts = GObject.registerClass(
   }
 );
 
-class Extension {
-  constructor() {
-    this.shortcuts = null;
-    this.settingsListener = null;
-    this.settings = null;
-  }
-
+export default class FocusWindowExtension extends Extension {
   enable() {
+    this.appSys = Shell.AppSystem.get_default();
     this.shortcuts = new KeyboardShortcuts();
 
-    this.settings = ExtensionUtils.getSettings(SETTINGS_ID);
+    this.settings = this.getSettings();
 
     this.settingsListener = this.settings.connect(
       `changed::${SETTINGS_KEY}`,
@@ -105,7 +96,9 @@ class Extension {
         this.shortcuts.bind(setting.keyboardShortcut, () => {
           try {
             // get application
-            const application = appSys.lookup_app(setting.applicationToFocus);
+            const application = this.appSys.lookup_app(
+              setting.applicationToFocus
+            );
             if (!application) return false;
 
             // get application windows and filter appropriately
@@ -122,8 +115,8 @@ class Extension {
                 .includes(setting.titleToMatch.toLowerCase());
             });
 
-            // get the currently focused window
-            const focusedWindow = global.display.get_focus_window().get_id();
+            // get the currently focused window (there may be none)
+            const focusedWindow = global.display.get_focus_window()?.get_id();
 
             // launch the application
             if (!appWindows.length && setting.launchApplication) {
@@ -165,8 +158,7 @@ class Extension {
 
             return false;
           } catch (error) {
-            log("setting trigger failed: ");
-            log(error);
+            console.error("focus-window: setting trigger failed:", error);
           }
         });
       }
@@ -180,9 +172,6 @@ class Extension {
     this.settingsListener = null;
     this.settings = null;
     this.shortcuts = null;
+    this.appSys = null;
   }
-}
-
-function init() {
-  return new Extension();
 }

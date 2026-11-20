@@ -1,9 +1,12 @@
-const { GObject, GLib, Gio, Adw, Gtk, Gdk } = imports.gi;
+import Adw from "gi://Adw";
+import Gdk from "gi://Gdk";
+import Gio from "gi://Gio";
+import GLib from "gi://GLib";
+import GObject from "gi://GObject";
+import Gtk from "gi://Gtk";
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
+import { ExtensionPreferences } from "resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js";
 
-const SETTINGS_ID = "org.gnome.shell.extensions.focus-window";
 const SETTINGS_KEY = "app-settings";
 const SETTINGS_VARIANT = "aa{sv}";
 
@@ -90,12 +93,14 @@ function generateSettings(settings) {
 
 // Begin Preference Creation
 
-function init() {}
-
 const FocusWidget = GObject.registerClass(
   {
-    GTypeName: "FocusWidget",
-    Template: Me.dir.get_child("prefs.ui").get_uri(),
+    GTypeName: "FocusWindowFocusWidget",
+    Template: GLib.Uri.resolve_relative(
+      import.meta.url,
+      "prefs.ui",
+      GLib.UriFlags.NONE
+    ),
     InternalChildren: [
       "application_to_focus",
       "application_list",
@@ -183,12 +188,12 @@ const FocusWidget = GObject.registerClass(
         valign: Gtk.Align.CENTER,
       });
       const buttonContent = new Adw.ButtonContent({
-        "icon-name": "app-remove-symbolic",
+        "icon-name": "user-trash-symbolic",
         label: "",
       });
       buttonContent.add_css_class("error");
       button.set_child(buttonContent);
-      this.add_action(button);
+      this.add_suffix(button);
 
       button.connect("clicked", () => this.onApplicationDelete());
     }
@@ -272,7 +277,7 @@ const FocusWidget = GObject.registerClass(
       this.keyboardShortcut.get_root().get_surface().restore_system_shortcuts();
       this.keyboardIsGrabbed = false;
       this.keyboardShortcut.set_accelerator(this.lastAccelerator);
-      this.keyboardShortcutRow.parent.unselect_all();
+      this.keyboardShortcutRow.get_parent()?.unselect_all?.();
       this.keyboardShortcut.set_disabled_text("Not Bound");
     }
 
@@ -372,12 +377,16 @@ const FocusWidget = GObject.registerClass(
   }
 );
 
-function fillPreferencesWindow(window) {
+export default class FocusWindowPreferences extends ExtensionPreferences {
+  fillPreferencesWindow(window) {
+    fillPreferencesWindow(window, this.getSettings());
+  }
+}
+
+function fillPreferencesWindow(window, extensionSettings) {
   // stores all focusWidgets
   const focusWidgets = [];
 
-  // get settings
-  const extensionSettings = ExtensionUtils.getSettings(SETTINGS_ID);
   const { getAllSettings, setSettings } = generateSettings(extensionSettings);
 
   // create preference pages
